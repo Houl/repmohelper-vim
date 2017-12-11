@@ -1,0 +1,113 @@
+*repmohelper.txt*	Easier creation of repmo mappings.
+
+Some people put |:for| loops in their scripts to create lots of similar
+mappings.  I think, for the creation of |repmo| mappings, it's better to use
+the unrolled explicit statements.  One reason: make it possible to grep the
+place where a mapping is defined.
+
+Here is a helper which defines a shortcut notation for repmo mappings.
+Think of zencode ...
+
+Commands: ~
+|:PutRepmoMap|, |:PutRepmoSelfMap|	put map-statements in the buffer
+|:EchoRepmoMap|, |:EchoRepmoSelfMap|	echo the map-statements
+
+XXX For convience, the shortcut notation is also put in comments, or not if
+|g:repmohelper_creator_comment| is off.
+
+
+						*:EchoRepmoSelfMap*
+:EchoRepmoSelfMap [{arg} ...]
+
+	:echo a list of map-statements which use |repmo#SelfKey()|.
+	When the output looks ok, you can use the same arguments with
+	|:PutRepmoSelfMap|.
+
+	{arg} can be one of the following:
+		{key}`|`{revkey}
+		{mode}
+		{modifier}
+
+	{key}		the key to map
+	{revkey}	the reverse key to map
+
+	{mode}		(default: `nxo`) switches the map command name(s) to
+			use for arguments that follow.
+			Special cases: ~
+			`nxo`	uses :map + :sunmap
+			`nvo`	uses :map
+			Everything else: ~
+			Eg `n` uses :nmap
+			Eg `nox` uses :nmap + :omap + :xmap
+
+	{modifier}	(default: empty) switches |map-arguments| for
+			arguments that follow.
+			`<buffer>` or `<global>`
+			(<global> is for switching back from <buffer>)
+			Other modifiers are not supported (yet).
+
+	Arguments are split at spaces, the backslash is not special.
+
+	Example: >
+		:EchoRepmoSelfMap j|k nvo <C-E>|<C-Y>
+<		=>
+		noremap <expr> j repmo#SelfKey('j', 'k')|sunmap j
+		noremap <expr> k repmo#SelfKey('k', 'j')|sunmap k
+		noremap <expr> <C-E> repmo#SelfKey('<C-E>', '<C-Y>')
+		noremap <expr> <C-Y> repmo#SelfKey('<C-Y>', '<C-E>')
+
+
+						*:EchoRepmoMap*
+:EchoRepmoMap [{arg} ...]
+
+	:echo a list of map-statements which use |repmo#Key()|.
+	When the output looks ok, you can use the same arguments with
+	|:PutRepmoMap|.
+
+	{arg} can be one of the following:
+		{key}`|`{revkey}`|`{key-rhs}`|`{revkey-rhs}
+		{key}`|`{revkey}
+		{mode}
+		{modifier}
+		{rhs-template}
+
+	{key}		the key to map
+	{revkey}	the reverse key to map
+	{key-rhs}	the key's right-hand-side (if missing: uses {rhs-template})
+	{revkey-rhs}	the reverse key's right-hand-side (if missing: uses {rhs-template})
+
+	{mode}		same as for |:EchoRepmoSelfMap|
+	{modifier}	same as for |:EchoRepmoSelfMap|
+
+	{rhs-template}	(default: "<Plug>(foo-<_>)") defines a right-hand-side
+		  	template for {key}`|`{revkey} arguments that follow.
+			Contains the string `<_>` which is replaced by {key}
+			or {revkey} when the template is expanded.
+
+	Examples: >
+		:EchoRepmoMap <Plug><_>-motion [[|]] [m|]m
+<		=>
+		map <expr> [[ repmo#Key('<Plug>[[-motion', '<Plug>]]-motion')|sunmap [[
+		map <expr> ]] repmo#Key('<Plug>]]-motion', '<Plug>[[-motion')|sunmap ]]
+		map <expr> [m repmo#Key('<Plug>[m-motion', '<Plug>]m-motion')|sunmap [m
+		map <expr> ]m repmo#Key('<Plug>]m-motion', '<Plug>[m-motion')|sunmap ]m
+>
+		:EchoRepmoMap [[|]]|<Plug>[[-motion|<Plug>]]-motion
+<		=>
+		map <expr> [[ repmo#Key('<Plug>[[-motion', '<Plug>]]-motion')|sunmap [[
+		map <expr> ]] repmo#Key('<Plug>]]-motion', '<Plug>[[-motion')|sunmap ]]
+
+
+						*:PutRepmoSelfMap*
+:[range]PutRepmoSelfMap[!] [{arg} ...]
+
+	like |:EchoRepmoSelfMap|, but :[range]put[!] the output into the
+	current buffer.
+
+
+						*:PutRepmoMap*
+:[range]PutRepmoMap[!] [{arg} ...]
+	
+	like |:EchoRepmoMap|, but :[range]put[!] the output into the current
+	buffer.
+
