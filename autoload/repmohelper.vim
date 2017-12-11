@@ -45,6 +45,9 @@ func! repmohelper#KeyMapStatements(keytuples, ...) "{{{
     endif
 endfunc "}}}
 
+
+" Secondary:
+
 func! repmohelper#Split(val, ...) "{{{
     " {val}	(string) or (list of string) or (list of (list of string)) or mixed
     " {a:1}	(list of number) allowed lengths (2 or greater)
@@ -53,6 +56,15 @@ func! repmohelper#Split(val, ...) "{{{
     let combo_modes = get(a:, 2, ['nvo', 'nxo'])
     return s:Split(a:val, expected_lengths, combo_modes)
 endfunc "}}}
+
+func! repmohelper#PutValue(expr, lnum, bang) "{{{
+    let lines = type(a:expr) <= 1 ? split(a:expr, "\n") : a:expr
+    let lnum = max([0, a:lnum - (a:bang ? 1 : 0)])
+    if !empty(lines)
+	call append(lnum, lines)
+    endif
+endfunc "}}}
+
 
 
 func! s:MapStatements(func_dict, expected_lengths, selfkeypairs, with_checks) "{{{

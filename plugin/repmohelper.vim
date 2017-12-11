@@ -8,5 +8,5 @@
 com!              -nargs=? EchoRepmoSelfMap  :echo join(repmohelper#SelfKeyMapStatements(<q-args>), "\n")
 com!              -nargs=? EchoRepmoMap      :echo join(repmohelper#KeyMapStatements(<q-args>), "\n")
                                             
-com! -bang -range -nargs=? PutRepmoSelfMap  :<line2>PutExpr<bang> repmohelper#SelfKeyMapStatements(<q-args>)
-com! -bang -range -nargs=? PutRepmoMap      :<line2>PutExpr<bang> repmohelper#KeyMapStatements(<q-args>)
+com! -bang -range -nargs=? PutRepmoSelfMap  :call repmohelper#PutValue(repmohelper#SelfKeyMapStatements(<q-args>), <line2>, <bang>0)
+com! -bang -range -nargs=? PutRepmoMap      :call repmohelper#PutValue(repmohelper#KeyMapStatements(<q-args>), <line2>, <bang>0)
